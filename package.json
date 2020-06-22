@@ -1,0 +1,21 @@
+{
+  "name": "confessions-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/gunnmgirl/confessions-server.git",
+  "author": "gunnmgirl <48892214+gunnmgirl@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon --require dotenv/config -r esm src/index"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "mongodb": "^3.5.9",
+    "mongoose": "^5.9.19",
+    "nodemon": "^2.0.4"
+  }
+}
