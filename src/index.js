@@ -3,6 +3,8 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import mongoose from "mongoose";
 
+import postRouter from "./routes/postRoutes";
+
 const app = express();
 const { PORT, CONNECTION_STRING } = process.env;
 
@@ -13,6 +15,8 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
+app.use("/api", postRouter);
 
 mongoose
   .connect(CONNECTION_STRING, { useNewUrlParser: true })
