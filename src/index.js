@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.use("/api", postRouter);
+app.use("/posts", postRouter);
 
 mongoose
   .connect(CONNECTION_STRING, { useNewUrlParser: true })
