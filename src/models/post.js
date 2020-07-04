@@ -7,6 +7,10 @@ const PostSchema = new Schema({
     type: String,
     required: true,
   },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
   upvotes: {
     type: Number,
     required: true,
