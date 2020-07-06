@@ -56,12 +56,28 @@ async function postComment(req, res, next) {
 }
 
 async function getPosts(req, res, next) {
-  const page = req.query.page;
+  const { page, sortBy } = req.query;
+
   try {
-    const posts = await Post.find()
-      .skip((page - 1) * POSTS_PER_PAGE)
-      .limit(POSTS_PER_PAGE);
-    return res.status(200).send(posts);
+    const totalPosts = await Post.find().countDocuments();
+    if (sortBy === "popular") {
+      const posts = await Post.find()
+        .sort({ upvotes: -1 })
+        .skip((page - 1) * POSTS_PER_PAGE)
+        .limit(POSTS_PER_PAGE);
+      return res.status(200).send({ posts, totalPosts });
+    } else if (sortBy === "latest") {
+      const posts = await Post.find()
+        .sort({ date: -1 })
+        .skip((page - 1) * POSTS_PER_PAGE)
+        .limit(POSTS_PER_PAGE);
+      return res.status(200).send({ posts, totalPosts });
+    } else {
+      const posts = await Post.find()
+        .skip((page - 1) * POSTS_PER_PAGE)
+        .limit(POSTS_PER_PAGE);
+      return res.status(200).send({ posts, totalPosts });
+    }
   } catch (error) {
     res.status(400).send(error);
   }
@@ -74,7 +90,8 @@ async function getPostsBySearchTerm(req, res, next) {
     const filteredPosts = posts.filter((post) =>
       post.text.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    return res.status(200).send(filteredPosts);
+    const totalPosts = filteredPosts.length;
+    return res.status(200).send({ filteredPosts, totalPosts });
   } catch (error) {
     res.status(400).send(error);
   }
