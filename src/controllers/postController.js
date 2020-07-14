@@ -1,6 +1,6 @@
 import Post from "../models/post";
 
-const POSTS_PER_PAGE = 3;
+const POSTS_PER_PAGE = 5;
 
 function validatePost(content) {
   if (
@@ -57,7 +57,6 @@ async function postComment(req, res, next) {
 
 async function getPosts(req, res, next) {
   const { page, sortBy } = req.query;
-
   try {
     const totalPosts = await Post.find().countDocuments();
     if (sortBy === "popular") {
@@ -84,14 +83,35 @@ async function getPosts(req, res, next) {
 }
 
 async function getPostsBySearchTerm(req, res, next) {
-  const searchTerm = req.query.term;
+  const { page, sortBy, searchTerm } = req.query;
   try {
-    const posts = await Post.find();
-    const filteredPosts = posts.filter((post) =>
-      post.text.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const totalPosts = filteredPosts.length;
-    return res.status(200).send({ filteredPosts, totalPosts });
+    const totalPosts = await Post.find({
+      $text: { $search: searchTerm, $caseSensitive: false },
+    }).countDocuments();
+    if (sortBy === "popular") {
+      const filteredPosts = await Post.find({
+        $text: { $search: searchTerm, $caseSensitive: false },
+      })
+        .sort({ upvotes: -1 })
+        .skip((page - 1) * POSTS_PER_PAGE)
+        .limit(POSTS_PER_PAGE);
+      return res.status(200).send({ filteredPosts, totalPosts });
+    } else if (sortBy === "latest") {
+      const filteredPosts = await Post.find({
+        $text: { $search: searchTerm, $caseSensitive: false },
+      })
+        .sort({ date: -1 })
+        .skip((page - 1) * POSTS_PER_PAGE)
+        .limit(POSTS_PER_PAGE);
+      return res.status(200).send({ filteredPosts, totalPosts });
+    } else {
+      const filteredPosts = await Post.find({
+        $text: { $search: searchTerm, $caseSensitive: false },
+      })
+        .skip((page - 1) * POSTS_PER_PAGE)
+        .limit(POSTS_PER_PAGE);
+      return res.status(200).send({ filteredPosts, totalPosts });
+    }
   } catch (error) {
     res.status(400).send(error);
   }
